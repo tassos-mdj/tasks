@@ -1,4 +1,4 @@
 import { style } from "./style.css";
-import { renderAuthScreen } from "./sreenController.js";
+import { renderAuthScreen, renderDashboard } from "./sreenController.js";
 
-renderAuthScreen();
+renderDashboard();

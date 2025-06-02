@@ -21,7 +21,7 @@ body {
 #welcome-section {
     display: grid;
     justify-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     max-width: 300px;
 }
 
@@ -34,10 +34,17 @@ body {
 #welcome-text {
     grid-area: 2 / 1 / 3 / 3;
     text-align: center;
+    margin-bottom: 0;
+}
+
+#welcome-subtext {
+    grid-area: 3 / 1 / 4 / 3;
+    text-align: center;
+    margin-top: 0;
 }
 
 #username {
-    grid-area: 3 / 1 / 4 / 2;
+    grid-area: 4 / 1 / 5 / 2;
     justify-self: stretch;
     border-radius: 50px;
     border: 1px solid gray;
@@ -45,7 +52,7 @@ body {
 }
 
 #login-button {
-    grid-area: 3 / 2 / 4 / 3;
+    grid-area: 4 / 2 / 5 / 3;
     background-color: #8AB983;
     padding: 0.5rem 1.4rem;
     border-radius: 50px;
@@ -54,7 +61,7 @@ body {
 }
 
 #disclaimer {
-    grid-area: 4 / 1 / 5 / 3;
+    grid-area: 5 / 1 / 6 / 3;
     font-style: italic;
     font-size: 0.8em;
 }
