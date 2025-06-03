@@ -6,11 +6,12 @@ import calendarIconSrc from './images/task-all.svg';
 import hashIconSrc from './images/hash.svg';
 import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
+import { menuSelector } from './index.js';
 
 const wrapper = document.querySelector('#wrapper');
 
 
-export function renderAuthScreen() {
+export function renderAuthScreen(loginFunction) {
     wrapper.innerHTML = '';
 
     const welcomeSection = document.createElement('section');
@@ -41,6 +42,7 @@ export function renderAuthScreen() {
     loginButton.setAttribute('id', 'login-button');
     loginButton.textContent = 'Login';
     welcomeSection.appendChild(loginButton);
+    loginButton.addEventListener('click', (e) => {loginFunction()});
 
     const disclaimer = document.createElement('p');
     disclaimer.setAttribute('id', 'disclaimer');
@@ -50,12 +52,12 @@ export function renderAuthScreen() {
     wrapper.appendChild(welcomeSection);
 }
 
-export function renderDashboard() {
+export function renderDashboard(userData, section) {
     wrapper.innerHTML = '';
     const container = document.createElement('div');
     container.classList.add('container');
 
-    container.appendChild(renderAside());
+    container.appendChild(renderAside(userData));
     container.appendChild(renderHeader());
     container.appendChild(renderNewTaskDialog());
 
@@ -65,45 +67,31 @@ export function renderDashboard() {
 
     const dataArea = document.createElement('div');
     dataArea.classList.add('data-area');
-    container.appendChild(dataArea);
 
     wrapper.appendChild(container);
+    container.appendChild(renderDataArea(dataArea, section, userData.tasks));
+  
 }
 
-function renderAside() {
+function renderAside(userData) {
     const aside = document.createElement('aside');
 
-    aside.appendChild(renderUserInfo());
-    aside.appendChild(renderMenu());
-    aside.appendChild(renderNav());
-
-    const ul = document.createElement('ul');
-    const li = document.createElement('li');
-    li.setAttribute('id', 'logout');
-    li.textContent = 'Logout';
-    ul.appendChild(li);
-    aside.appendChild(ul);
-    return aside;
-}
-
-function renderUserInfo() {
     const userInfo = document.createElement('div');
     userInfo.classList.add('user-info');
 
     const userPfp = document.createElement('p');
     userPfp.setAttribute('id', 'user-pfp');
-    userPfp.setAttribute('data-letters', '');
+    userPfp.setAttribute('data-letters', userData.username.charAt(0));
     userInfo.appendChild(userPfp);
 
     const userNameDisplay = document.createElement('p');
     userNameDisplay.classList.add('user-name-display');
+    userNameDisplay.textContent = userData.username;
     userInfo.appendChild(userNameDisplay);
-    return userInfo;
-}
+    aside.appendChild(userInfo);
 
-function renderMenu() {
     const menu = document.createElement('menu');
-    const ul = document.createElement('ul');
+    const menuUl = document.createElement('ul');
 
     const taskAdd = document.createElement('li');
     taskAdd.setAttribute('id', 'task-add');
@@ -146,20 +134,23 @@ function renderMenu() {
     calendar.appendChild(calendarIcon);
     calendar.appendChild(calendarPara);
 
-    ul.appendChild(taskAdd);
-    ul.appendChild(agenda);
-    ul.appendChild(today);
-    ul.appendChild(calendar);
+    menuUl.appendChild(taskAdd);
+    menuUl.appendChild(agenda);
+    menuUl.appendChild(today);
+    menuUl.appendChild(calendar);
     
-    menu.appendChild(ul);
+    menu.appendChild(menuUl);
+    
+    const lis = menu.querySelectorAll('li');
+    for (let i = 0; i < lis.length ; i++) {
+        lis[i].addEventListener('click', (e) => {menuSelector(e)});
+    }
 
-    return menu;
-}
+    aside.appendChild(menu);
 
-function renderNav() {
     const nav = document.createElement('nav');
-    const ul = document.createElement('ul');
-    ul.setAttribute('id', 'cat-ul');
+    const navUl = document.createElement('ul');
+    navUl.setAttribute('id', 'cat-ul');
 
     const allCategories = document.createElement('li');
     allCategories.setAttribute('id', 'all-cat');
@@ -170,10 +161,19 @@ function renderNav() {
     allCategories.appendChild(hashIcon);
     allCategories.appendChild(allCatPara);
 
-    ul.appendChild(allCategories);
-    nav.appendChild(ul);
+    navUl.appendChild(allCategories);
+    nav.appendChild(navUl);
 
-    return nav;
+    aside.appendChild(nav);
+
+    const logoutUl = document.createElement('ul');
+    const li = document.createElement('li');
+    li.setAttribute('id', 'logout');
+    li.textContent = 'Logout';
+    logoutUl.appendChild(li);
+    aside.appendChild(logoutUl);
+
+    return aside;
 }
 
 function renderHeader() {
@@ -262,3 +262,89 @@ function renderNewTaskDialog() {
     return dialog;
 }
 
+function renderTasks(dataArea, userTasks) {
+    if (userTasks.length === 0) {
+        let task = document.createElement('div');
+        task.classList.add('task');
+
+        let taskDescription = document.createElement('p');
+        taskDescription.classList.add('task-description');
+        taskDescription.textContent = 'All clear!';
+        task.appendChild(taskDescription);
+        dataArea.appendChild(task);
+    }
+
+    for (let currentTask of userTasks) {
+        renderSingleTask(dataArea, currentTask, currentTask.id);
+    }
+    return dataArea;
+}
+
+function renderSingleTask(container, currentTask, taskID) {
+    let task = document.createElement('div');
+    task.classList.add('task');
+    task.setAttribute('id', `task-${taskID}`);
+
+    let taskTitle = document.createElement('h3');
+    taskTitle.classList.add('task-title');
+    taskTitle.textContent = currentTask.title;
+    task.appendChild(taskTitle);
+
+    let taskDescription = document.createElement('p');
+    taskDescription.classList.add('task-description');
+    taskDescription.textContent = currentTask.description;
+    task.appendChild(taskDescription);
+
+    const categories = document.createElement('div');
+    categories.classList.add('task-categories');
+    
+    for (let category of currentTask.categories) {
+        let span = document.createElement('span');
+        span.classList.add('task-category');
+
+        // Add delete button on active task only
+        const link = document.createElement('a');
+        link.addEventListener('click', e => task.id === 'task-active-task' ? removeCategory(task, currentTask, category) : console.log('Task open'));
+        link.textContent = ' x';
+        span.textContent = '#' + category;
+        if (task.id === 'task-active-task') { span.appendChild(link); }
+
+        categories.appendChild(span);
+    }
+    // Add + button for adding categories
+    const addButton = document.createElement('span');
+    addButton.classList.add('task-category-add-button');
+    addButton.textContent = '+';
+    if (task.id === 'task-active-task') {categories.appendChild(addButton);}
+
+    task.appendChild(categories);
+
+    let dueDate = document.createElement('div');
+    dueDate.classList.add('due-date');
+    dueDate.textContent = currentTask.duedate;
+    task.appendChild(dueDate);
+
+    container.appendChild(task);
+}
+
+function renderDataArea(dataArea, section, userTasks) {
+    dataArea.innerHTML = '';
+
+    const heading = document.createElement('h2');
+    heading.setAttribute('id', section);
+    heading.classList.add('heading');
+    heading.textContent = section;
+    dataArea.appendChild(heading);
+
+    if (section === "calendar") {
+        console.log('Calendar selected');
+        // loadCalendar(userTasks);
+    } else {
+        const article = document.createElement('article');
+        article.classList.add('list-view');
+        renderTasks(article, userTasks);
+        dataArea.appendChild(article);
+    }
+
+    return dataArea;
+}

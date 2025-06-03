@@ -1,4 +1,4 @@
-export const index = [
+export let index = [
     {
     username: 'Tassos',
     view: 'cards',
