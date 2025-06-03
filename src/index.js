@@ -9,15 +9,14 @@ const currentDate = format(new Date(), "yyyy-MM-dd");
 let currentIndex = index; // || updateIndex();
 let userData;
 let activeUser;
+let section = 'agenda';
 
-export function menuSelector(e) {
-    console.log(e.srcElement.id || e.srcElement.parentNode.id);
-}
+
 
 function login() {
     const usernameInput = document.querySelector('#username');
     activeUser = usernameInput.value; //.toLowerCase();
-    loadDashboard(activeUser);
+    loadDashboard(activeUser, section);
 }
 
 function loadDashboard(activeUser) {
@@ -46,6 +45,31 @@ function loadDashboard(activeUser) {
         document.getElementById('all-cat').classList.add('active-menu-item');
         console.log('Login check: loading dashboard');
     }
+}
+
+export function menuSelector(e) {
+    let id =  e.srcElement.id || e.srcElement.parentNode.id;
+    switch (id) {
+        case 'agenda':
+            return {'activeId' : id, 'activeTasks': loadAgenda(userData.tasks)};
+            break;
+        case 'today':
+            return {'activeId' : id, 'activeTasks': loadToday(userData.tasks)};
+            break;
+        case 'calendar':
+            return {'activeId' : id, 'activeTasks' : userData.tasks};
+            break;
+    }
+}
+
+//Sort tasks for agenda
+function loadAgenda(tasks) {
+    return tasks.sort((a,b) => new Date(a.duedate) - new Date(b.duedate));
+}
+
+//Filter today's tasks
+function loadToday(tasks) {
+    return tasks.filter((task) => task.duedate === currentDate);
 }
 
 

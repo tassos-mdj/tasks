@@ -7,7 +7,7 @@ export let index = [
             title: 'Groceries',
             description: 'Flour, Soap, Milk',
             categories: ['home', 'chores'],
-            duedate: '2025-06-02',
+            duedate: '2025-06-03',
             id: 0
         },
         {
