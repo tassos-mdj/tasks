@@ -47,19 +47,29 @@ function loadDashboard(activeUser) {
     }
 }
 
-export function menuSelector(e) {
-    let id =  e.srcElement.id || e.srcElement.parentNode.id;
-    switch (id) {
+export function menuSelector(e, currentSection) {
+    let selection =  e.srcElement.id || e.srcElement.parentNode.id;
+    const menuItems = ['agenda', 'today', 'calendar'];
+    return menuItems.includes(selection) ? tasksLoader(userData.tasks, selection, 'cat-all') : tasksLoader(userData.tasks, currentSection, selection);
+}
+
+function tasksLoader(tasks, section, rawFilter) {
+    let filter = rawFilter.slice(4);
+    console.log(filter);
+    let activeTasks;
+    switch (section) {
         case 'agenda':
-            return {'activeId' : id, 'activeTasks': loadAgenda(userData.tasks)};
+            filter === 'all' ? activeTasks = loadAgenda(tasks) : activeTasks = loadAgenda(catFilter(tasks, filter));
             break;
         case 'today':
-            return {'activeId' : id, 'activeTasks': loadToday(userData.tasks)};
+            filter === 'all' ? activeTasks = loadToday(tasks) : activeTasks = loadToday(catFilter(tasks, filter));
             break;
         case 'calendar':
-            return {'activeId' : id, 'activeTasks' : userData.tasks};
+            filter === 'all' ? activeTasks = tasks : activeTasks = catFilter(tasks, filter);
             break;
     }
+
+return {'activeId': section, 'activeData': activeTasks};
 }
 
 //Sort tasks for agenda
@@ -70,6 +80,29 @@ function loadAgenda(tasks) {
 //Filter today's tasks
 function loadToday(tasks) {
     return tasks.filter((task) => task.duedate === currentDate);
+}
+
+//Retrieve user task categories from all tasks
+export function catLoader(tasks) {
+    let catList = [];
+    for (let task of tasks) {
+        for (let category of task.categories) {
+            if (!catList.includes(category)) {
+                catList.push(category);
+            }
+        }
+    }
+    return catList;
+}
+
+function catFilter(tasks, id) {
+    let filteredTasksList = [];
+    for (let task of tasks) {
+        if (task.categories.includes(id)) {
+             filteredTasksList.push(task);
+        }
+    }
+    return filteredTasksList;
 }
 
 

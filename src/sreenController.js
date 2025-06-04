@@ -6,7 +6,7 @@ import calendarIconSrc from './images/task-all.svg';
 import hashIconSrc from './images/hash.svg';
 import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
-import { menuSelector } from './index.js';
+import { catLoader, menuSelector } from './index.js';
 import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
@@ -179,21 +179,28 @@ function renderAside(userData) {
 function navigationHandler(dataArea) {
     const menu = document.querySelector('menu');
     const lis = menu.querySelectorAll('li');
+    let currentSection;
     for (let i = 0; i < lis.length ; i++) {
-        lis[i].addEventListener('click', (e) => {
-            let activeData =  menuSelector(e);
-            
-            if (activeData[0] !== 'task-add') {
-                resetActiveMenuItems();
-                lis[i].classList.add('active-menu-item');
-                renderDataArea(dataArea, activeData.activeId, activeData.activeTasks);
-            } else  {
-                
-            }
-
-            
-        });
+        if (lis[i].classList.contains('active-menu-item')) {
+            currentSection = lis[i].id;
+        }
     }
+    const aside = document.querySelector('aside')
+    aside.addEventListener("click", (e) => {
+        let activeData = menuSelector(e, currentSection);
+        renderDataArea(dataArea, activeData.activeId, activeData.activeData);
+    });
+
+    // const domCategories = document.querySelector('nav');
+    // const navLis = domCategories.querySelectorAll('li');
+    // for (let j = 0; j < navLis.length; j++) {
+    //     navLis[j].addEventListener('click', (e) => {
+    //         activeData = menuSelector(e);
+    //         // resetActiveCategories();
+    //         lis[j].classList.add('active-menu-item');
+    //         renderDataArea(dataArea, activeData.activeId, activeData.activeTasks);
+    //     })
+    // }
 }
 
 function renderHeader() {
@@ -283,6 +290,8 @@ function renderNewTaskDialog() {
 }
 
 function renderTasks(dataArea, userTasks) {
+    renderCategories(catLoader(userTasks));
+
     if (userTasks.length === 0) {
         let task = document.createElement('div');
         task.classList.add('task');
@@ -483,4 +492,30 @@ function renderCalendar(userTasks) {
 
 manipulate();
 
+}
+
+function renderCategories(catList) {
+    const catUl = document.getElementById('cat-ul');
+    catUl.innerHTML ='';
+    const allCatLi = document.createElement('li');
+    allCatLi.setAttribute('id', 'all-cat');
+    let img = new Image();
+    img.src = hashIconSrc;
+    const allCatP  = document.createElement('p');
+        allCatP.textContent = 'All Categories';
+        allCatLi.appendChild(img);
+        allCatLi.appendChild(allCatP);
+        catUl.appendChild(allCatLi);
+    for (let item of catList) {
+        let itemId = 'cat-' + item.toLowerCase();
+        const li = document.createElement('li');
+        li.setAttribute('id', itemId);
+        img = new Image();
+        img.src = hashIconSrc;
+        const p  = document.createElement('p');
+        p.textContent = item;
+        li.appendChild(img);
+        li.appendChild(p);
+        catUl.appendChild(li);
+    }
 }
