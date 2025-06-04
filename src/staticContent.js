@@ -7,14 +7,14 @@ export let index = [
             title: 'Groceries',
             description: 'Flour, Soap, Milk',
             categories: ['home', 'chores'],
-            duedate: '2025-06-03',
+            duedate: '2025-06-04',
             id: 0
         },
         {
             title: 'Bar supplies',
             description: 'vodka, whiskey, gin',
             categories: ['home', 'fun'],
-            duedate: '2025-06-15',
+            duedate: '2025-06-04',
             id: 1
         },
         {

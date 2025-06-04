@@ -6,7 +6,7 @@ import calendarIconSrc from './images/task-all.svg';
 import hashIconSrc from './images/hash.svg';
 import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
-import { catLoader, menuSelector } from './index.js';
+import { catLoader, loadToday, menuSelector } from './index.js';
 import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
@@ -72,6 +72,8 @@ export function renderDashboard(userData, section) {
     wrapper.appendChild(container);
     container.appendChild(renderDataArea(dataArea, section, userData.tasks));
     navigationHandler(dataArea);
+    renderCategories(catLoader(userData.tasks));
+
   
 }
 
@@ -153,7 +155,7 @@ function renderAside(userData) {
     navUl.setAttribute('id', 'cat-ul');
 
     const allCategories = document.createElement('li');
-    allCategories.setAttribute('id', 'all-cat');
+    allCategories.setAttribute('id', 'cat-all');
     const hashIcon = new Image;
     hashIcon.src = hashIconSrc;
     const allCatPara = document.createElement('p');
@@ -187,20 +189,13 @@ function navigationHandler(dataArea) {
     }
     const aside = document.querySelector('aside')
     aside.addEventListener("click", (e) => {
-        let activeData = menuSelector(e, currentSection);
-        renderDataArea(dataArea, activeData.activeId, activeData.activeData);
+        let activeData = menuSelector(e);
+        if (activeData) {
+            renderCategories(catLoader(activeData.unfilteredSectionData));
+            renderDataArea(dataArea, activeData.activeId, activeData.activeData);
+            resetActiveMenuItems(activeData.activeId, currentSection, activeData.activeCategory);
+        }
     });
-
-    // const domCategories = document.querySelector('nav');
-    // const navLis = domCategories.querySelectorAll('li');
-    // for (let j = 0; j < navLis.length; j++) {
-    //     navLis[j].addEventListener('click', (e) => {
-    //         activeData = menuSelector(e);
-    //         // resetActiveCategories();
-    //         lis[j].classList.add('active-menu-item');
-    //         renderDataArea(dataArea, activeData.activeId, activeData.activeTasks);
-    //     })
-    // }
 }
 
 function renderHeader() {
@@ -290,7 +285,7 @@ function renderNewTaskDialog() {
 }
 
 function renderTasks(dataArea, userTasks) {
-    renderCategories(catLoader(userTasks));
+
 
     if (userTasks.length === 0) {
         let task = document.createElement('div');
@@ -377,10 +372,20 @@ function renderDataArea(dataArea, section, userTasks) {
     return dataArea;
 }
 
-function resetActiveMenuItems() {
+function resetActiveMenuItems(item, section, selectedCategory = 'cat-all') {
     document.getElementById('agenda').classList.remove('active-menu-item');
     document.getElementById('today').classList.remove('active-menu-item');
     document.getElementById('calendar').classList.remove('active-menu-item');
+    
+    document.getElementById(item).classList.add('active-menu-item');
+
+    const nav = document.getElementById('cat-ul');
+    const categories = nav.querySelectorAll('li');
+    for (let category of categories) {
+        category.classList.remove('active-menu-item');
+    }
+
+    document.getElementById(selectedCategory).classList.add('active-menu-item');
 }
 
 function renderCalendar(userTasks) {
@@ -498,7 +503,7 @@ function renderCategories(catList) {
     const catUl = document.getElementById('cat-ul');
     catUl.innerHTML ='';
     const allCatLi = document.createElement('li');
-    allCatLi.setAttribute('id', 'all-cat');
+    allCatLi.setAttribute('id', 'cat-all');
     let img = new Image();
     img.src = hashIconSrc;
     const allCatP  = document.createElement('p');
@@ -518,4 +523,5 @@ function renderCategories(catList) {
         li.appendChild(p);
         catUl.appendChild(li);
     }
+    console.log("renderCategories Run!!");
 }
