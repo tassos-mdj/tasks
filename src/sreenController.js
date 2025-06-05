@@ -427,7 +427,7 @@ function renderCalendar(userTasks) {
         let dayone = new Date(year, month, 0).getDay();
 
         // Get the last date of the month
-        let lastdate = new Date(year, month + 1, -1).getDate();
+        let lastdate = new Date(year, month + 1, 0).getDate();
 
         // Get the day of the last date of the month
         let dayend = new Date(year, month, lastdate).getDay();
