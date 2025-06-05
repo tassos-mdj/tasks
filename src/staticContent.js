@@ -7,28 +7,28 @@ export let index = [
             title: 'Groceries',
             description: 'Flour, Soap, Milk',
             categories: ['home', 'chores'],
-            duedate: '2025-06-05',
+            dueDate: '2025-06-05',
             id: 0
         },
         {
             title: 'Bar supplies',
             description: 'vodka, whiskey, gin',
             categories: ['home', 'fun'],
-            duedate: '2025-06-05',
+            dueDate: '2025-06-05',
             id: 1
         },
         {
             title: 'Food supplies',
             description: 'Item1, Item2, Item3',
             categories: ['home', 'family'],
-            duedate: '2025-06-30',
+            dueDate: '2025-06-30',
             id: 2
         },
         {    
             title: 'Organize Party',
             description: 'Buy booze, send invitations',
             categories: ['fun'],
-            duedate: '2025-06-18',
+            dueDate: '2025-06-18',
             id: 3
         },
     ]
@@ -41,14 +41,14 @@ export let index = [
                 title: 'Vacation Planning',
                 description: 'Get tickets, renew passport',
                 categories: ['vacation', 'family', 'home'],
-                duedate: '2025-06-27',
+                dueDate: '2025-06-27',
                 id: 0
             },
             {
                 title: 'Gym routine',
                 description: 'Stand-ups, sit-ups, pull-ups, push-ups',
                 categories: ['health', 'fun'],
-                duedate: '2025-06-31',
+                dueDate: '2025-06-31',
                 id: 1
             }
         ]

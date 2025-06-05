@@ -11,7 +11,7 @@ import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
 
-
+//Login screen creation
 export function renderAuthScreen(loginFunction) {
     wrapper.innerHTML = '';
 
@@ -53,6 +53,7 @@ export function renderAuthScreen(loginFunction) {
     wrapper.appendChild(welcomeSection);
 }
 
+//Main app screen creation
 export function renderDashboard(userData, section) {
     wrapper.innerHTML = '';
     const container = document.createElement('div');
@@ -178,6 +179,7 @@ function renderAside(userData) {
     return aside;
 }
 
+//Menu selection listener & subsequent rendering of selection
 function navigationHandler(dataArea) {
     const menu = document.querySelector('menu');
     const lis = menu.querySelectorAll('li');
@@ -307,7 +309,7 @@ function renderTasks(dataArea, userTasks) {
             renderSingleTask(dataArea, currentTask, currentTask.id);
         }
     }
-    return dataArea;
+    // return dataArea;
 }
 
 function renderSingleTask(container, currentTask, taskID) {
@@ -357,6 +359,7 @@ function renderSingleTask(container, currentTask, taskID) {
     container.appendChild(task);
 }
 
+//Create the area containing the tasks
 function renderDataArea(dataArea, section, userTasks) {
     dataArea.innerHTML = '';
 
@@ -378,6 +381,7 @@ function renderDataArea(dataArea, section, userTasks) {
     return dataArea;
 }
 
+//Selection highlight handler
 function resetActiveMenuItems(item, section, selectedCategory = 'cat-all') {
     document.getElementById('agenda').classList.remove('active-menu-item');
     document.getElementById('today').classList.remove('active-menu-item');
@@ -395,6 +399,7 @@ function resetActiveMenuItems(item, section, selectedCategory = 'cat-all') {
 }
 
 function renderCalendar(userTasks) {
+    console.log("Cal run" ,userTasks);
     
     let date = new Date();
     let year = date.getFullYear();
@@ -452,7 +457,6 @@ function renderCalendar(userTasks) {
 
             // Load day's tasks
             renderTasks(li, userTasks.filter((task) => task.dueDate === format(new Date(year, month - 1, monthlastdate - i + 1), "yyy-MM-dd")));
-
             container.appendChild(li);
       }
 
@@ -475,7 +479,6 @@ function renderCalendar(userTasks) {
 
                 // Load day's tasks
                 renderTasks(li, userTasks.filter((task) => task.dueDate === format(new Date(year, month, i), "yyy-MM-dd")));
-
                 container.appendChild(li);
         }
 
@@ -505,6 +508,7 @@ manipulate();
 
 }
 
+//Display tasks' available categories / tags
 function renderCategories(catList) {
     const catUl = document.getElementById('cat-ul');
     catUl.innerHTML ='';

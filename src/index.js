@@ -12,12 +12,14 @@ let userData;
 let activeUser;
 let section = 'agenda';
 
+//Get user from login screen
 function login() {
     const usernameInput = document.querySelector('#username');
     activeUser = usernameInput.value; //.toLowerCase();
     loadDashboard(activeUser, section);
 }
 
+//Check user & load application
 function loadDashboard(activeUser) {
     //find user
     userData = currentIndex.reduce((final, entry) => {
@@ -37,14 +39,13 @@ function loadDashboard(activeUser) {
         console.log('Login check: new user added');
         loadDashboard(activeUser);
     } else {
-        // loadAgenda(userData.tasks);
         renderDashboard(userData, 'agenda');
-        // displayCategories(catLoader(userData.tasks));
         document.getElementById('cat-all').classList.add('active-menu-item');
         console.log('Login check: loading dashboard');
     }
 }
 
+//Menu selector logic
 export function menuSelector(e) {
     let selection = e.srcElement.id || e.srcElement.parentNode.id;
 
@@ -74,6 +75,7 @@ export function menuSelector(e) {
     }
 }
 
+//Load tasks that meet criteria
 function tasksLoader(tasks, section, rawFilter) {
     let filter = rawFilter.slice(4);
     let activeTasks;
@@ -97,12 +99,12 @@ return {'activeId': section, 'activeData': activeTasks, 'activeCategory': rawFil
 
 //Sort tasks for agenda
 function loadAgenda(tasks) {
-    return tasks.sort((a,b) => new Date(a.duedate) - new Date(b.duedate));
+    return tasks.sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate));
 }
 
 //Filter today's tasks
 function loadToday(tasks) {
-    return tasks.filter((task) => task.duedate === currentDate);
+    return tasks.filter((task) => task.dueDate === currentDate);
 }
 
 //Retrieve user task categories from all tasks
@@ -121,6 +123,7 @@ export function catLoader(tasks) {
     return catList;
 }
 
+//Filter tasks by selected category
 function catFilter(tasks, id) {
     let filteredTasksList = [];
     for (let task of tasks) {
@@ -131,6 +134,7 @@ function catFilter(tasks, id) {
     return filteredTasksList;
 }
 
+//Add new task logic
 function taskAdd() {
     const newTask = document.querySelector('#new-task');
     newTask.showModal();
@@ -197,4 +201,5 @@ function taskAdd() {
 
 }
 
+//Login screen loader
 renderAuthScreen(login);
