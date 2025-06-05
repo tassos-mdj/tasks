@@ -189,7 +189,11 @@ function navigationHandler(dataArea) {
     }
     const aside = document.querySelector('aside')
     aside.addEventListener("click", (e) => {
+        if (e.srcElement.nodeName === 'ASIDE') {
+        return;
+    }
         let activeData = menuSelector(e);
+        
         if (activeData) {
             renderCategories(catLoader(activeData.unfilteredSectionData));
             renderDataArea(dataArea, activeData.activeId, activeData.activeData);
@@ -287,7 +291,7 @@ function renderNewTaskDialog() {
 function renderTasks(dataArea, userTasks) {
 
 
-    if (userTasks.length === 0) {
+    if (!userTasks || userTasks.length === 0) {
         let task = document.createElement('div');
         task.classList.add('task');
 
@@ -296,10 +300,12 @@ function renderTasks(dataArea, userTasks) {
         taskDescription.textContent = 'All clear!';
         task.appendChild(taskDescription);
         dataArea.appendChild(task);
-    }
+        
+    } else {
 
-    for (let currentTask of userTasks) {
-        renderSingleTask(dataArea, currentTask, currentTask.id);
+        for (let currentTask of userTasks) {
+            renderSingleTask(dataArea, currentTask, currentTask.id);
+        }
     }
     return dataArea;
 }
@@ -345,7 +351,7 @@ function renderSingleTask(container, currentTask, taskID) {
 
     let dueDate = document.createElement('div');
     dueDate.classList.add('due-date');
-    dueDate.textContent = currentTask.duedate;
+    dueDate.textContent = currentTask.dueDate;
     task.appendChild(dueDate);
 
     container.appendChild(task);
@@ -445,7 +451,7 @@ function renderCalendar(userTasks) {
             li.appendChild(p);
 
             // Load day's tasks
-            renderTasks(li, userTasks.filter((task) => task.duedate === format(new Date(year, month - 1, monthlastdate - i + 1), "yyy-MM-dd")));
+            renderTasks(li, userTasks.filter((task) => task.dueDate === format(new Date(year, month - 1, monthlastdate - i + 1), "yyy-MM-dd")));
 
             container.appendChild(li);
       }
@@ -468,7 +474,7 @@ function renderCalendar(userTasks) {
                 li.appendChild(p);
 
                 // Load day's tasks
-                renderTasks(li, userTasks.filter((task) => task.duedate === format(new Date(year, month, i), "yyy-MM-dd")));
+                renderTasks(li, userTasks.filter((task) => task.dueDate === format(new Date(year, month, i), "yyy-MM-dd")));
 
                 container.appendChild(li);
         }
@@ -483,7 +489,7 @@ function renderCalendar(userTasks) {
             li.appendChild(p);
 
             // Load day's tasks
-            renderTasks(li, userTasks.filter((task) => task.duedate === format(new Date(year, month + 1, i - dayend + 1), "yyy-MM-dd")));
+            renderTasks(li, userTasks.filter((task) => task.dueDate === format(new Date(year, month + 1, i - dayend + 1), "yyy-MM-dd")));
 
             container.appendChild(li);
         }
@@ -523,5 +529,4 @@ function renderCategories(catList) {
         li.appendChild(p);
         catUl.appendChild(li);
     }
-    console.log("renderCategories Run!!");
 }

@@ -12,8 +12,6 @@ let userData;
 let activeUser;
 let section = 'agenda';
 
-
-
 function login() {
     const usernameInput = document.querySelector('#username');
     activeUser = usernameInput.value; //.toLowerCase();
@@ -48,23 +46,31 @@ function loadDashboard(activeUser) {
 }
 
 export function menuSelector(e) {
-    let selection =  e.srcElement.id || e.srcElement.parentNode.id;
-
-    
+    let selection = e.srcElement.id || e.srcElement.parentNode.id;
 
     const menuItems = ['agenda', 'today', 'calendar'];
     let currentSection;
 
-    for (let i = 0; i < menuItems.length ; i++) {
-        if (document.getElementById(menuItems[i]).classList.contains('active-menu-item')) {
-            currentSection = menuItems[i];
+     
+        for (let i = 0; i < menuItems.length; i++) {
+            if (document.getElementById(menuItems[i]).classList.contains('active-menu-item')) {
+                currentSection = menuItems[i];
+            }
         }
-    }
+    
 
     if (selection === 'task-add') {
         taskAdd();
     } else {
-    return menuItems.includes(selection) ? tasksLoader(userData.tasks, selection, 'cat-all') : tasksLoader(userData.tasks, currentSection, selection);
+        if (selection === 'logout') {
+            renderAuthScreen(login);
+        } else {
+            if (!userData.tasks) {
+                window.alert("Nothing here! Try adding some tasks first!");
+                return;
+            }
+            return menuItems.includes(selection) ? tasksLoader(userData.tasks, selection, 'cat-all') : tasksLoader(userData.tasks, currentSection, selection);
+        }
     }
 }
 
@@ -102,10 +108,13 @@ function loadToday(tasks) {
 //Retrieve user task categories from all tasks
 export function catLoader(tasks) {
     let catList = [];
-    for (let task of tasks) {
-        for (let category of task.categories) {
-            if (!catList.includes(category)) {
-                catList.push(category);
+
+    if (tasks) {
+        for (let task of tasks) {
+            for (let category of task.categories) {
+                if (!catList.includes(category)) {
+                    catList.push(category);
+                }
             }
         }
     }
@@ -171,12 +180,13 @@ function taskAdd() {
             const inputCategories = form.elements[2].value.split(',');
             const trimmedInputCategories = inputCategories.map(cat => cat.trim());
             let lastId;
+            !userData.tasks ? userData.tasks = [] : userData.tasks;
             if (userData.tasks.length > 0) {
                 lastId = userData.tasks.reduce((acc, val) => {return acc.id > val.id ? acc : val}) + 1;
             } else {
                 lastId = 0;
             }
-            const newEntry = new Task({title: form.elements[0].value, description: form.elements[1].value, categories: trimmedInputCategories, duedate: form.elements[3].value, id: lastId});
+            const newEntry = new Task({title: form.elements[0].value, description: form.elements[1].value, categories: trimmedInputCategories, dueDate: form.elements[3].value, id: lastId});
             console.log("New task: ",newEntry);
             userData.tasks.push(newEntry);
             loadDashboard(activeUser);
@@ -186,6 +196,5 @@ function taskAdd() {
     });
 
 }
-
 
 renderAuthScreen(login);
