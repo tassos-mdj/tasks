@@ -201,5 +201,12 @@ function taskAdd() {
 
 }
 
+//Remove task logic
+export function removeTask(task) {
+    const index = userData.tasks.indexOf(task);
+    userData.tasks.splice(index, 1);
+    loadDashboard(activeUser);
+}
+
 //Login screen loader
 renderAuthScreen(login);

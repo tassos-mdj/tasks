@@ -6,7 +6,8 @@ import calendarIconSrc from './images/task-all.svg';
 import hashIconSrc from './images/hash.svg';
 import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
-import { catLoader, loadToday, menuSelector } from './index.js';
+import deleteButtonSrc from './images/trash-2.svg'
+import { catLoader, menuSelector, removeTask } from './index.js';
 import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
@@ -292,7 +293,7 @@ function renderNewTaskDialog() {
 
 function renderTasks(dataArea, userTasks) {
 
-
+    // Create no tasks message
     if (!userTasks || userTasks.length === 0) {
         let task = document.createElement('div');
         task.classList.add('task');
@@ -304,12 +305,24 @@ function renderTasks(dataArea, userTasks) {
         dataArea.appendChild(task);
         
     } else {
-
+        //Find and display tasks
         for (let currentTask of userTasks) {
             renderSingleTask(dataArea, currentTask, currentTask.id);
         }
+
+        //Add listeners for displaying full task
+        const renderedTasks = dataArea.querySelectorAll('.task');
+        for (let renderedTask of renderedTasks) {
+            renderedTask.addEventListener('click', () => {
+                for (let userTask of userTasks) {
+                if (`task-${userTask.id}` === renderedTask.id) {
+                    displayTask(userTask);
+                    console.log(userTask);
+                }
+            }
+            })
+        }
     }
-    // return dataArea;
 }
 
 function renderSingleTask(container, currentTask, taskID) {
@@ -533,4 +546,30 @@ function renderCategories(catList) {
         li.appendChild(p);
         catUl.appendChild(li);
     }
+}
+
+//Display full task modal
+function displayTask(task) {
+    const taskView = document.querySelector('#task-view');
+    taskView.innerHTML = '';
+
+    const closeBtn = new Image();
+    closeBtn.src = closeIconSrc;
+    closeBtn.alt = 'Close button';
+    closeBtn.classList.add('close');
+    taskView.appendChild(closeBtn);
+    closeBtn.addEventListener('click', (e) => taskView.close());
+    
+    const deleteBtn = new Image();
+    deleteBtn.src = deleteButtonSrc;
+    deleteBtn.alt = 'Delete Button';
+    deleteBtn.classList.add('delete');
+    taskView.appendChild(deleteBtn);
+    deleteBtn.addEventListener('click', function () {
+        taskView.close();
+        removeTask(task);
+    } )
+
+    renderSingleTask(taskView, task, 'active-task');
+    taskView.showModal();
 }
