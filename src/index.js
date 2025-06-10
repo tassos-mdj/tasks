@@ -8,7 +8,7 @@ import { Task } from "./task.js";
 
 const currentDate = format(new Date(), "yyyy-MM-dd");
 let currentIndex = index; // || updateIndex();
-let userData;
+export let userData;
 let activeUser;
 let section = 'agenda';
 
@@ -205,6 +205,18 @@ function taskAdd() {
 export function removeTask(task) {
     const index = userData.tasks.indexOf(task);
     userData.tasks.splice(index, 1);
+    loadDashboard(activeUser);
+}
+
+//Remove categories
+export function removeCategory(task, category) {
+    task.categories = task.categories.filter(item => item !== category);
+    loadDashboard(activeUser);
+}
+
+//Add categories
+export function addCategory(task, category) {
+    task.categories.push(category);
     loadDashboard(activeUser);
 }
 

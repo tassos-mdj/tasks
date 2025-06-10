@@ -397,6 +397,13 @@ dialog {
     cursor: pointer;
 }
 
+.edit {
+    position: absolute;
+    top: 10px;
+    right: 45px;
+    cursor: pointer;
+}
+
 .delete {
     position: absolute;
     bottom: 10px;

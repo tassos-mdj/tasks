@@ -7,7 +7,8 @@ import hashIconSrc from './images/hash.svg';
 import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
 import deleteButtonSrc from './images/trash-2.svg'
-import { catLoader, menuSelector, removeTask } from './index.js';
+import editIconSrc from './images/edit.svg';
+import { catLoader, menuSelector, removeTask, removeCategory, addCategory, userData } from './index.js';
 import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
@@ -203,6 +204,28 @@ function navigationHandler(dataArea) {
             resetActiveMenuItems(activeData.activeId, currentSection, activeData.activeCategory);
         }
     });
+
+    const toggleView = document.querySelector('.toggle-view');
+    const article = document.querySelector('article');
+    toggleView.addEventListener('click', () => {
+        article.classList.contains('list-view')
+            ? article.classList.replace('list-view', 'cards-view')
+            : article.classList.replace('cards-view', 'list-view');
+    })
+
+    //Add listeners for displaying full task
+        const renderedTasks = dataArea.querySelectorAll('.task');
+        for (let renderedTask of renderedTasks) {
+            renderedTask.addEventListener('click', () => {
+                for (let userTask of userData.tasks) {
+                if (`task-${userTask.id}` === renderedTask.id) {
+                    displayTask(userTask);
+                    console.log(userTask);
+                }
+            }
+            })
+        }
+
 }
 
 function renderHeader() {
@@ -310,18 +333,6 @@ function renderTasks(dataArea, userTasks) {
             renderSingleTask(dataArea, currentTask, currentTask.id);
         }
 
-        //Add listeners for displaying full task
-        const renderedTasks = dataArea.querySelectorAll('.task');
-        for (let renderedTask of renderedTasks) {
-            renderedTask.addEventListener('click', () => {
-                for (let userTask of userTasks) {
-                if (`task-${userTask.id}` === renderedTask.id) {
-                    displayTask(userTask);
-                    console.log(userTask);
-                }
-            }
-            })
-        }
     }
 }
 
@@ -349,19 +360,19 @@ function renderSingleTask(container, currentTask, taskID) {
 
         // Add delete button on active task only
         const link = document.createElement('a');
-        link.addEventListener('click', e => task.id === 'task-active-task' ? removeCategory(task, currentTask, category) : console.log('Task open'));
+        link.addEventListener('click', e => {
+            if (task.id === 'task-active-task') {
+                removeCategory(currentTask, category);
+                displayTask(currentTask);
+            } 
+        });
         link.textContent = ' x';
         span.textContent = '#' + category;
         if (task.id === 'task-active-task') { span.appendChild(link); }
 
         categories.appendChild(span);
     }
-    // Add + button for adding categories
-    const addButton = document.createElement('span');
-    addButton.classList.add('task-category-add-button');
-    addButton.textContent = '+';
-    if (task.id === 'task-active-task') {categories.appendChild(addButton);}
-
+    
     task.appendChild(categories);
 
     let dueDate = document.createElement('div');
@@ -559,6 +570,13 @@ function displayTask(task) {
     closeBtn.classList.add('close');
     taskView.appendChild(closeBtn);
     closeBtn.addEventListener('click', (e) => taskView.close());
+
+    const editBtn = new Image();
+    editBtn.src = editIconSrc;
+    editBtn.alt = 'Edit button';
+    editBtn.classList.add('edit');
+    taskView.appendChild(editBtn);
+    editBtn.addEventListener('click', () => console.log('Edit Button'));
     
     const deleteBtn = new Image();
     deleteBtn.src = deleteButtonSrc;
