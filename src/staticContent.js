@@ -32,25 +32,5 @@ export let index = [
             id: 3
         },
     ]
-    },
-    {
-        username: 'Agapi',
-        view: 'list',
-        tasks: [
-            {
-                title: 'Vacation Planning',
-                description: 'Get tickets, renew passport',
-                categories: ['vacation', 'family', 'home'],
-                dueDate: '2025-06-27',
-                id: 0
-            },
-            {
-                title: 'Gym routine',
-                description: 'Stand-ups, sit-ups, pull-ups, push-ups',
-                categories: ['health', 'fun'],
-                dueDate: '2025-06-31',
-                id: 1
-            }
-        ]
     }
 ];

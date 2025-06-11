@@ -57,10 +57,13 @@ export function renderAuthScreen(loginFunction) {
 
 export function renderNewUserWelcome() {
     const dialog = document.createElement('dialog');
+    dialog.classList.add('new-user-welcome-dialog');
     const heading = document.createElement('h3');
     heading.textContent = 'Welcome!'
     const para = document.createElement('p');
     para.textContent = 'Seems like you are new here. You can load some sample data or start fresh! Choose below:';
+    const buttons = document.createElement('div');
+    buttons.classList.add('welcome-buttons');
     const button1 = document.createElement('button');
     button1.value = 'Load sample';
     button1.textContent = 'Load sample';
@@ -73,8 +76,9 @@ export function renderNewUserWelcome() {
     
     dialog.appendChild(heading);
     dialog.appendChild(para);
-    dialog.appendChild(button1);
-    dialog.appendChild(button2);
+    buttons.appendChild(button1);
+    buttons.appendChild(button2);
+    dialog.appendChild(buttons);
 
     wrapper.appendChild(dialog);
     dialog.showModal();

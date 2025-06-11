@@ -66,6 +66,31 @@ body {
     font-size: 0.8em;
 }
 
+.new-user-welcome-dialog {
+    padding: 2rem;
+    font-size: 1.5rem;
+}
+
+.new-user-welcome-dialog p, .new-user-welcome-dialog h3 {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.welcome-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.welcome-buttons button {
+    background-color: #8AB983;
+    padding: 0.5rem 1.4rem;
+    border-radius: 50px;
+    font-weight: 400;
+    border: none;
+    
+}
+
 .container {
     display: grid;
     grid-template-columns: minmax(50px, 300px) 4fr;
@@ -500,4 +525,5 @@ form.task input {
     border-radius: 15px;
     justify-self: center;
 }
+
 

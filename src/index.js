@@ -5,9 +5,11 @@ import { updateIndex } from "./storageController.js";
 import { format } from "date-fns";
 import { User } from "./user.js";
 import { Task } from "./task.js";
+import { parseISO } from "date-fns/fp";
 
 const currentDate = format(new Date(), "yyyy-MM-dd");
-let currentIndex = index; // || updateIndex();
+
+let currentIndex = updateIndex();
 export let userData;
 let activeUser;
 let section = 'agenda';
@@ -19,33 +21,48 @@ function login() {
     loadDashboard(activeUser, section);
 }
 
-//Check user & load application
-function loadDashboard(activeUser) {
+function findUser(activeUser, indexSet) {
     //find user
-    userData = currentIndex.reduce((final, entry) => {
+    return indexSet.reduce((final, entry) => {
         if (entry.username === activeUser){
             final = entry;
             
         }  
             return final;
         } , {})
+}
+
+//Check user & load application
+function loadDashboard(activeUser) {
+    userData = findUser(activeUser, currentIndex);
     
     //check if user exists to load dashboard. If not add user & load dashboard
     if (Object.keys(userData).length === 0) {
         let addUser = new User(activeUser);
-        currentIndex.push(addUser);
         console.log(currentIndex);
-        // updateIndex(currentIndex);
-        console.log('Login check: new user added');
         renderNewUserWelcome();
 
+        //Sample data option selector
         const buttons = document.querySelectorAll('.sample-load-button');
             for (let button of buttons) {
             button.addEventListener('click', () => {
+                if (button.value === 'Load sample') {
+                    let sampleUser = findUser('Tassos', index);
+                    addUser.tasks = sampleUser.tasks;
+                    currentIndex.push(addUser);
+                    updateIndex(currentIndex);
+                    loadDashboard(activeUser);
+
+                } else {
+                    currentIndex.push(addUser);
+                    updateIndex(currentIndex);
+                    loadDashboard(activeUser);}
                 console.log(button.value);
             });
             }
-        // loadDashboard(activeUser);
+            console.log(currentIndex);
+            console.log('Login check: new user added');
+
     } else {
         renderDashboard(userData, 'agenda');
         document.getElementById('cat-all').classList.add('active-menu-item');
@@ -81,6 +98,20 @@ export function menuSelector(e) {
             return menuItems.includes(selection) ? tasksLoader(userData.tasks, selection, 'cat-all') : tasksLoader(userData.tasks, currentSection, selection);
         }
     }
+}
+
+function updateUserData(userData) {
+    let position;
+    let user = currentIndex.reduce((final, entry) => {
+        if (entry.username === activeUser){
+            final = entry
+        }  
+        return final;
+        } , {})
+
+    position = currentIndex.indexOf(user);
+    currentIndex[position].tasks = userData.tasks;
+    updateIndex(currentIndex);
 }
 
 //Load tasks that meet criteria
@@ -222,7 +253,7 @@ export function taskSubmit(form, container) {
                 }
                 
             }
-
+            updateUserData(userData);
             loadDashboard(activeUser);
             // container.close();
         }
