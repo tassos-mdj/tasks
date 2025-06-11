@@ -424,13 +424,14 @@ dialog::backdrop {
 
 #task-active-task .task-title {
     font-size: 1.4em;
+    font-weight: 900;
 }
 
 #task-active-task .task-category {
     padding: 0.4rem 0.8rem 0.4rem 1.7rem;
 }
 
-div#task-active-task > *:nth-child(-n + 3) {
+div#task-active-task > *:nth-child(-n + 3),  form#task-active-task > *:nth-child(-n + 3){
     border-bottom: 1px solid #ddd;
     padding-bottom: 1rem;
 }
@@ -487,5 +488,16 @@ label[for=new-date] {
 
 #new-date {
     width: 100%;
+}
+
+form.task input {
+    border: none;
+}
+
+#update-task {
+    width: 30%;
+    padding: 0.5rem;
+    border-radius: 15px;
+    justify-self: center;
 }
 

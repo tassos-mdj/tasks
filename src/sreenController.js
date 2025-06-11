@@ -8,7 +8,7 @@ import slidersIconSrc from './images/sliders.svg';
 import closeIconSrc from './images/x-circle.svg';
 import deleteButtonSrc from './images/trash-2.svg'
 import editIconSrc from './images/edit.svg';
-import { catLoader, menuSelector, removeTask, removeCategory, addCategory, userData } from './index.js';
+import { catLoader, menuSelector, removeTask, removeCategory, addCategory, userData, taskSubmit } from './index.js';
 import { format } from 'date-fns';
 
 const wrapper = document.querySelector('#wrapper');
@@ -55,6 +55,33 @@ export function renderAuthScreen(loginFunction) {
     wrapper.appendChild(welcomeSection);
 }
 
+export function renderNewUserWelcome() {
+    const dialog = document.createElement('dialog');
+    const heading = document.createElement('h3');
+    heading.textContent = 'Welcome!'
+    const para = document.createElement('p');
+    para.textContent = 'Seems like you are new here. You can load some sample data or start fresh! Choose below:';
+    const button1 = document.createElement('button');
+    button1.value = 'Load sample';
+    button1.textContent = 'Load sample';
+    button1.classList.add('sample-load-button');
+    const button2 = document.createElement('button');
+    button2.value = 'Start fresh';
+    button2.textContent = 'Start fresh';
+    button2.classList.add('sample-load-button');
+
+    
+    dialog.appendChild(heading);
+    dialog.appendChild(para);
+    dialog.appendChild(button1);
+    dialog.appendChild(button2);
+
+    wrapper.appendChild(dialog);
+    dialog.showModal();
+
+    
+}
+
 //Main app screen creation
 export function renderDashboard(userData, section) {
     wrapper.innerHTML = '';
@@ -67,6 +94,7 @@ export function renderDashboard(userData, section) {
 
     const taskViewDialog = document.createElement('dialog');
     taskViewDialog.setAttribute('id', 'task-view');
+    
     container.appendChild(taskViewDialog);
 
     const dataArea = document.createElement('div');
@@ -202,6 +230,7 @@ function navigationHandler(dataArea) {
             renderCategories(catLoader(activeData.unfilteredSectionData));
             renderDataArea(dataArea, activeData.activeId, activeData.activeData);
             resetActiveMenuItems(activeData.activeId, currentSection, activeData.activeCategory);
+            renderedTasksListener(dataArea);
         }
     });
 
@@ -213,20 +242,22 @@ function navigationHandler(dataArea) {
             : article.classList.replace('cards-view', 'list-view');
     })
 
-    //Add listeners for displaying full task
+    
+}
+
+//Add listeners for displaying full task
+function renderedTasksListener(dataArea) {
         const renderedTasks = dataArea.querySelectorAll('.task');
         for (let renderedTask of renderedTasks) {
             renderedTask.addEventListener('click', () => {
                 for (let userTask of userData.tasks) {
                 if (`task-${userTask.id}` === renderedTask.id) {
-                    displayTask(userTask);
-                    console.log(userTask);
+                    renderDisplayTaskDialog(userTask);
                 }
             }
             })
         }
-
-}
+    }
 
 function renderHeader() {
     const header = document.createElement('header');
@@ -249,14 +280,16 @@ function renderNewTaskDialog() {
     const dialog = document.createElement('dialog');
     dialog.setAttribute('id', 'new-task');
 
-    const form = document.createElement('form');
-    form.setAttribute('id', 'new-task-form');
-
     const closeIcon = new Image;
     closeIcon.classList.add('close');
     closeIcon.setAttribute('alt', 'Close dialog button');
     closeIcon.src = closeIconSrc;
-    form.appendChild(closeIcon);
+    closeIcon.addEventListener('click', (e) => dialog.close());
+    dialog.appendChild(closeIcon);
+
+    const form = document.createElement('form');
+    form.setAttribute('id', 'new-task-form');
+
 
     const legend = document.createElement('legend');
     legend.textContent = "What's on your mind?";
@@ -363,7 +396,7 @@ function renderSingleTask(container, currentTask, taskID) {
         link.addEventListener('click', e => {
             if (task.id === 'task-active-task') {
                 removeCategory(currentTask, category);
-                displayTask(currentTask);
+                renderDisplayTaskDialog(currentTask);
             } 
         });
         link.textContent = ' x';
@@ -560,10 +593,13 @@ function renderCategories(catList) {
 }
 
 //Display full task modal
-function displayTask(task) {
+function renderDisplayTaskDialog(task) {
     const taskView = document.querySelector('#task-view');
     taskView.innerHTML = '';
-
+    const content = document.createElement('div');
+    content.classList.add('display-content');
+    taskView.appendChild(content);
+    
     const closeBtn = new Image();
     closeBtn.src = closeIconSrc;
     closeBtn.alt = 'Close button';
@@ -576,7 +612,10 @@ function displayTask(task) {
     editBtn.alt = 'Edit button';
     editBtn.classList.add('edit');
     taskView.appendChild(editBtn);
-    editBtn.addEventListener('click', () => console.log('Edit Button'));
+    editBtn.addEventListener('click', () => {
+        renderEditTask(content, task, 'active-task');
+        editBtn.classList.add('hidden');
+    });
     
     const deleteBtn = new Image();
     deleteBtn.src = deleteButtonSrc;
@@ -588,6 +627,73 @@ function displayTask(task) {
         removeTask(task);
     } )
 
-    renderSingleTask(taskView, task, 'active-task');
+    
+    content.innerHTML = '';
+    renderSingleTask(content, task, 'active-task');
     taskView.showModal();
+}
+
+function renderEditTask(container, currentTask, taskID) {
+    container.innerHTML = '';
+    let form = document.createElement('form');
+    form.classList.add('task');
+    form.setAttribute('id', `task-${taskID}`);
+
+    const showTitleField = document.createElement('div');
+    const taskTitle = document.createElement('input');
+    taskTitle.setAttribute('type', 'text');
+    taskTitle.setAttribute('name', 'task-title');
+    taskTitle.setAttribute('value', currentTask.title);
+    taskTitle.classList.add('task-title');
+    showTitleField.appendChild(taskTitle);
+    const small = document.createElement('small');
+    showTitleField.appendChild(small);
+    form.appendChild(showTitleField);
+
+    const showDescField = document.createElement('div');
+    const taskDescription = document.createElement('input');
+    taskDescription.setAttribute('type', 'text');
+    taskDescription.setAttribute('name', 'task-description');
+    taskDescription.setAttribute('value', currentTask.description);
+    taskDescription.classList.add('task-description');
+    showDescField.appendChild(taskDescription);
+    form.appendChild(showDescField);
+
+    const categories = document.createElement('div');
+    categories.classList.add('task-categories');
+    const catList = document.createElement('input');
+    catList.setAttribute('type', 'text');
+    let currentCats = '';
+    for (let category of currentTask.categories) {
+        currentCats === ''
+            ? currentCats = category
+            : currentCats = currentCats + ',' + category;
+    }
+    catList.setAttribute('value', currentCats);
+    categories.appendChild(catList);
+    form.appendChild(categories);
+
+    const showDateField = document.createElement('div');
+    const date = document.createElement('input');
+    date.setAttribute('type', 'date');
+    date.setAttribute('name', 'task-date');
+    date.setAttribute('value', currentTask.dueDate);
+    showDateField.appendChild(date);
+    form.appendChild(showDateField);
+
+    const submit = document.createElement('input');
+    submit.setAttribute('type', 'submit');
+    submit.setAttribute('value', 'Save');
+    submit.setAttribute('id', 'update-task');
+    form.appendChild(submit);
+
+    const id = document.createElement('input');
+    id.setAttribute('type', 'number');
+    id.setAttribute('value', currentTask.id);
+    id.setAttribute('id', 'task-in-edit');
+    id.classList.add('hidden');
+    form.appendChild(id);
+    
+    container.appendChild(form);
+    taskSubmit(form, container);
 }

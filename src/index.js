@@ -1,5 +1,5 @@
 import { style } from "./style.css";
-import { renderAuthScreen, renderDashboard } from "./sreenController.js";
+import { renderAuthScreen, renderDashboard, renderNewUserWelcome } from "./sreenController.js";
 import { index } from "./staticContent.js";
 import { updateIndex } from "./storageController.js";
 import { format } from "date-fns";
@@ -37,7 +37,15 @@ function loadDashboard(activeUser) {
         console.log(currentIndex);
         // updateIndex(currentIndex);
         console.log('Login check: new user added');
-        loadDashboard(activeUser);
+        renderNewUserWelcome();
+
+        const buttons = document.querySelectorAll('.sample-load-button');
+            for (let button of buttons) {
+            button.addEventListener('click', () => {
+                console.log(button.value);
+            });
+            }
+        // loadDashboard(activeUser);
     } else {
         renderDashboard(userData, 'agenda');
         document.getElementById('cat-all').classList.add('active-menu-item');
@@ -139,11 +147,16 @@ function taskAdd() {
     const newTask = document.querySelector('#new-task');
     newTask.showModal();
     let form = document.getElementById('new-task-form');
-    const formDefault = form;
     const dateField = document.getElementById('new-date');
     dateField.value = format(new Date(), 'yyyy-MM-dd');
     const closeBtn = document.querySelector('.close');
-    closeBtn.addEventListener('click', (e) => newTask.close());
+    taskSubmit(form, newTask);
+    const formDefault = form;
+    form.innerHTML = formDefault.innerHTML;
+}
+
+export function taskSubmit(form, container) {
+
 
     // show a message with a type of the input
     function showMessage(input, message, type) {
@@ -171,34 +184,49 @@ function taskAdd() {
     }
 
     const TITLE_REQUIRED = "Please enter a title";
-    
+
 
     form.addEventListener("submit", function (event) {
         // stop form submission
         event.preventDefault();
 
         // validate the form
-        let nameValid = hasValue(form.elements["new-title"], TITLE_REQUIRED);
-        
+        let nameValid = hasValue(form.elements["new-title"] || form.elements["task-title"], TITLE_REQUIRED);
+
         if (nameValid) {
             const inputCategories = form.elements[2].value.split(',');
             const trimmedInputCategories = inputCategories.map(cat => cat.trim());
             let lastId;
             !userData.tasks ? userData.tasks = [] : userData.tasks;
             if (userData.tasks.length > 0) {
-                lastId = userData.tasks.reduce((acc, val) => {return acc.id > val.id ? acc : val}) + 1;
+                lastId = userData.tasks.reduce((acc, val) => { return acc.id > val.id ? acc : val }) + 1;
             } else {
                 lastId = 0;
             }
-            const newEntry = new Task({title: form.elements[0].value, description: form.elements[1].value, categories: trimmedInputCategories, dueDate: form.elements[3].value, id: lastId});
-            console.log("New task: ",newEntry);
-            userData.tasks.push(newEntry);
+
+            const newEntry = new Task({ title: form.elements[0].value, description: form.elements[1].value, categories: trimmedInputCategories, dueDate: form.elements[3].value, id: lastId });
+            const currentid = document.querySelector('#task-in-edit');
+
+            if (!currentid) {
+                console.log("New task: ", newEntry);
+                userData.tasks.push(newEntry);
+            } else {
+                
+                for (let task of userData.tasks) {
+                    if (task.id === parseInt(currentid.value)) {
+                        task.title = newEntry.title;
+                        task.description = newEntry.description;
+                        task.categories = newEntry.categories;
+                        task.dueDate = newEntry.dueDate;
+                    }
+                }
+                
+            }
+
             loadDashboard(activeUser);
-            form.innerHTML = formDefault.innerHTML;
-            newTask.close();
+            // container.close();
         }
     });
-
 }
 
 //Remove task logic
